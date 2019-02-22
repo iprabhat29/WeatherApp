@@ -20,7 +20,11 @@ def threaded(c):
       c.send(data_string)   
     # connection closed 
       #c.close() 
-  
+
+"""
+This dispatcher takes client request from the client queue in 
+FIFO way and gets back the response
+""" 
 def dispatcher():
   while(1):
     print_lock.acquire()
@@ -32,41 +36,25 @@ def dispatcher():
       print_lock.release()
       continue
 
+"""
+Main starts the dispatcher thread which will start serving client as they send their request. The client is added to the list(shared object done so that if we need multiple dispatcher to increase throughput) as they come.
+"""
 
 def Main(): 
     start_new_thread(dispatcher,())
     host = "" 
-  
-    # reverse a port on your computer 
-    # in our case it is 12345 but it 
-    # can be anything 
     port = 12345
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
     s.bind((host, port)) 
     print("socket binded to post", port) 
   
-    # put the socket into listening mode 
     s.listen(5) 
-    print("socket is listening") 
-    
-    # a forever loop until client wants to exit 
+    print("socket is listening")    
     while True: 
   
-        # establish connection with client 
         c, addr = s.accept()   
-        # lock acquired by client 
         print_lock.acquire() 
         print('Connected to :', addr[0], ':', addr[1]) 
         q_list.append([c,addr])
         print_lock.release()
-        # Start a new thread and return its identifier 
-        #start_new_thread(threaded, (c,)) 
-    s.close() 
-
-#def run_test():
-  #print "Starting REST API Backend"
-  #rest_api_run()
-
-#if __name__ == '__main__': 
-    #start_new_thread(run_test,())
-    #Main()
+    s.close()

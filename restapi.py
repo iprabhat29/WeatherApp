@@ -11,6 +11,10 @@ print_lock = threading.Lock()
 
 app = Flask(__name__)
 
+"""
+This function hits the werather api with the url and gets the response back.
+The response is Jsonified.
+"""
 def urlopen(city_name):
   api_key = "062b3ebf1bb4453cc5a8773030ab9ae1"
   base_url = "http://api.openweathermap.org/data/2.5/weather?"
@@ -21,7 +25,9 @@ def urlopen(city_name):
   else:
     print response.status_code
   return result_data
-
+"""
+This function formats the data received by the web api.
+"""
 def data_organizer(raw_api_dict):
   data = dict(
   city=raw_api_dict.get('name'),
@@ -38,7 +44,10 @@ def data_organizer(raw_api_dict):
   )
   return data
 
-
+"""
+This function is called when a user sends get request
+URL format for this API will be http://127.0.0.1:5000/weatherapi/<city_name>
+"""
 @app.route('/weatherapi/<string:location>', methods=['GET'])
 def get_task(location):
   try:
@@ -48,9 +57,21 @@ def get_task(location):
   except IOError:
     print('no internet')
 
+"""
+This function starts the REST Service
+
+"""
+
 def rest_api_run():
   #print "Starting REST"
   app.run()
+
+"""
+When this program is run, it will spawn 2 threads:
+1) This thread will be starting REST API.
+2) This thread will start the sever which will spawn separate 
+   thread for separate client
+"""
 
 if __name__ == '__main__':
   t1 = threading.Thread(target=Main, args=())
